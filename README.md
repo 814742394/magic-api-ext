@@ -24,6 +24,14 @@
 
 ## 安装
 
+> 发布到 JetBrains Marketplace 的流程见 [`docs/publishing.md`](docs/publishing.md)。
+
+### 从 Marketplace 安装（发布后）
+
+*Settings → Plugins → Marketplace* 搜索 **Magic API** 安装即可。
+
+### 从本地构建安装
+
 从源码构建后安装：
 
 ```bash

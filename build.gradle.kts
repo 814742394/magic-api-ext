@@ -48,8 +48,29 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+/**
+ * Marketplace publishing.
+ *
+ * The token is a Marketplace "permanent token" bound to your JetBrains account and
+ * must never be committed. Provide it through either:
+ *   - the PUBLISH_TOKEN environment variable (used by CI), or
+ *   - `publishToken=` in ~/.gradle/gradle.properties (kept outside the repository).
+ *
+ * `org.gradle.project.publishToken` covers `-PpublishToken=...`.
+ */
+val publishToken: String? = providers.gradleProperty("publishToken").orNull
+    ?: providers.environmentVariable("PUBLISH_TOKEN").orNull
+
 intellijPlatform {
     buildSearchableOptions.set(false)
+
+    publishing {
+        if (publishToken != null) {
+            token.set(publishToken)
+        }
+        // "default" is the stable channel every user gets; add "beta"/"eap" for prereleases.
+        channels.set(listOf("default"))
+    }
 
     pluginConfiguration {
         id = "org.ssssssss.magicapi.idea"
