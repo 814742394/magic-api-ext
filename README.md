@@ -1,5 +1,8 @@
 # Magic API — IntelliJ IDEA 插件
 
+![Build](https://github.com/814742394/magic-api-ext/actions/workflows/build.yml/badge.svg)
+
+
 为 [magic-api](https://www.ssssssss.org/magic-api/) 的接口脚本（[magic-script](https://gitee.com/ssssssss-team/magic-script) 语言）提供 IDE 支持：
 语法高亮、内置模块补全、快速文档、代码折叠、结构视图。
 
@@ -110,6 +113,11 @@ docs/                      调研产出：语法规范、内置模块速查
 3. 都没有时，下载 IntelliJ IDEA Community 2026.1
 
 这样在 IDE 里直接打开工程也能构建，同时不把某台机器的绝对路径写进版本库。
+
+## 持续集成
+
+`.github/workflows/build.yml` 会在每次 push / PR 时用 JDK 21 + IntelliJ IDEA Community 2026.1
+跑完整测试并构建插件包，产物作为 workflow artifact 上传（见仓库 Actions 页面）。
 
 ## 许可
 
