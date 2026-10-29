@@ -9,6 +9,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Creating a Release needs write access to repository contents. The default
+# GITHUB_TOKEN is read-only in this repository, which surfaces as
+# "Resource not accessible by integration" (403) when publishing the release.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
