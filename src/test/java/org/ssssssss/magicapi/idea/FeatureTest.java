@@ -79,6 +79,57 @@ public class FeatureTest extends BasePlatformTestCase {
                 myFixture.getEditor().getDocument().getText().contains("path"));
     }
 
+    public void testFileTypeIsRegisteredForMsExtension() {
+        assertEquals(MagicScriptFileType.INSTANCE,
+                com.intellij.openapi.fileTypes.FileTypeManager.getInstance()
+                        .getFileTypeByFileName("user-list.ms"));
+        assertEquals("ms", MagicScriptFileType.INSTANCE.getDefaultExtension());
+        assertEquals("MagicScript", MagicScriptFileType.INSTANCE.getName());
+    }
+
+    public void testSyntaxHighlighterCoversCoreTokens() {
+        com.intellij.openapi.fileTypes.SyntaxHighlighter highlighter =
+                new org.ssssssss.magicapi.idea.highlight.MagicScriptSyntaxHighlighterFactory()
+                        .getSyntaxHighlighter(getProject(), null);
+        assertNotNull(highlighter);
+        var lexer = highlighter.getHighlightingLexer();
+        lexer.start("var a = 1; // c\nvar s = \"\"\"select 1\"\"\";");
+        int highlighted = 0;
+        while (lexer.getTokenType() != null) {
+            if (highlighter.getTokenHighlights(lexer.getTokenType()).length > 0) {
+                highlighted++;
+            }
+            lexer.advance();
+        }
+        assertTrue("some tokens must be highlighted", highlighted > 0);
+    }
+
+    public void testCommenterPrefixes() {
+        org.ssssssss.magicapi.idea.lang.MagicScriptCommenter commenter =
+                new org.ssssssss.magicapi.idea.lang.MagicScriptCommenter();
+        assertEquals("//", commenter.getLineCommentPrefix());
+        assertEquals("/*", commenter.getBlockCommentPrefix());
+        assertEquals("*/", commenter.getBlockCommentSuffix());
+    }
+
+    public void testBraceMatcherPairs() {
+        org.ssssssss.magicapi.idea.lang.MagicScriptBraceMatcher matcher =
+                new org.ssssssss.magicapi.idea.lang.MagicScriptBraceMatcher();
+        assertEquals(3, matcher.getPairs().length);
+    }
+
+    public void testStructureViewModelExposesOutline() {
+        myFixture.configureByText(MagicScriptFileType.INSTANCE, """
+                import log;
+                var a = 1;
+                return db.select('select 1');
+                """);
+        var model = new org.ssssssss.magicapi.idea.structure.MagicScriptStructureViewModel(myFixture.getFile());
+        var root = model.getRoot();
+        assertNotNull(root);
+        assertTrue("outline must contain elements", root.getChildren().length >= 3);
+    }
+
     public void testDocumentationForModule() {
         PsiFile file = createFile("return db.select('select 1');");
         MagicScriptDocumentationProvider provider = new MagicScriptDocumentationProvider();
