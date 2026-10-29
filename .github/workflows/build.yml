@@ -3,6 +3,8 @@ name: Build
 on:
   push:
     branches: [main]
+    # Tags drive the release: `git tag v0.1.5 && git push origin v0.1.5`
+    tags: ['v*']
   pull_request:
     branches: [main]
   workflow_dispatch:

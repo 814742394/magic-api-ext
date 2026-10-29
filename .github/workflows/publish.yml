@@ -55,7 +55,22 @@ jobs:
             -Psigning.certificateChainFile=chain.crt \
             -Psigning.privateKeyFile=private.pem
 
+      # Skip gracefully until PUBLISH_TOKEN exists in repository secrets,
+      # so tagging a release does not show a red build for a missing token.
+      - name: Check publish token
+        id: token
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+        run: |
+          if [ -n "$PUBLISH_TOKEN" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::PUBLISH_TOKEN 未配置，跳过 Marketplace 发布（GitHub Release 仍会由 Build 工作流创建）"
+          fi
+
       - name: Publish
+        if: steps.token.outputs.present == 'true'
         env:
           PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
         run: ./gradlew publishPlugin --no-daemon
