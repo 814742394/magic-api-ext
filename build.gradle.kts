@@ -35,7 +35,9 @@ dependencies {
         if (localIdeaPath != null) {
             local(localIdeaPath)
         } else {
-            create("IC", "2026.1")
+            // IDEA Community is no longer published as a separate artifact since
+            // 2025.3, so `intellijIdea(...)` must be used instead of `create("IC", ...)`.
+            intellijIdea("2026.1.5")
         }
         testFramework(TestFrameworkType.Platform)
     }

@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +23,25 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # The IntelliJ Platform SDK is ~1.5 GB. Caching it keeps subsequent builds
+      # from re-downloading the whole IDE distribution on every run.
+      - name: Cache IntelliJ Platform SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/caches/9.8.2/transforms
+          key: intellij-sdk-${{ runner.os }}-${{ hashFiles('build.gradle.kts', 'gradle.properties') }}
+          restore-keys: |
+            intellij-sdk-${{ runner.os }}-
+
       - name: Compile and run tests
         run: ./gradlew test --no-daemon
+        env:
+          GRADLE_OPTS: >-
+            -Dorg.gradle.internal.http.socketTimeout=180000
+            -Dorg.gradle.internal.http.connectionTimeout=180000
+            -Dorg.gradle.internal.repository.max.retries=5
 
       - name: Build plugin
         run: ./gradlew buildPlugin --no-daemon
