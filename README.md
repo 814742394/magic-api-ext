@@ -24,11 +24,18 @@
 从源码构建后安装：
 
 ```bash
-# 首次构建（会下载 IntelliJ Platform Gradle 插件依赖）
+# 使用本机已安装的 IDEA 作为编译 SDK（推荐，避免下载数百 MB）
+./gradlew buildPlugin -PideaPath="/Applications/IntelliJ IDEA.app"
+
+# 或用环境变量 / gradle.properties 里的 ideaPath 指定
+export IDEA_PATH="/Applications/IntelliJ IDEA.app"
+./gradlew buildPlugin
+
+# 不指定时自动下载 IntelliJ IDEA Community 2026.1 作为 SDK
 ./gradlew buildPlugin
 
 # 产物
-build/distributions/magic-api-idea-0.1.0.zip
+build/distributions/magic-api-idea-0.1.2.zip
 ```
 
 在 IDE 中：<kbd>Settings</kbd> → <kbd>Plugins</kbd> → ⚙️ → <kbd>Install Plugin from Disk…</kbd> → 选择上面的 zip → 重启。
@@ -96,8 +103,13 @@ docs/                      调研产出：语法规范、内置模块速查
 ./gradlew verifyPlugin  # 插件兼容性校验（需联网）
 ```
 
-测试使用 IDEA 社区分发提供的 `BasePlatformTestCase` 轻量夹具；`build.gradle.kts` 通过 `local("/Applications/IntelliJ IDEA.app")`
-复用本机安装的 IDE 作为编译与测试 SDK（可用环境变量或改动该路径指向其他安装位置）。
+测试使用平台提供的 `BasePlatformTestCase` 轻量夹具。编译/测试 SDK 的解析顺序：
+
+1. `-PideaPath=...` 或 `gradle.properties` 中的 `ideaPath`
+2. 环境变量 `IDEA_PATH`
+3. 都没有时，下载 IntelliJ IDEA Community 2026.1
+
+这样在 IDE 里直接打开工程也能构建，同时不把某台机器的绝对路径写进版本库。
 
 ## 许可
 
