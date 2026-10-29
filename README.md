@@ -71,6 +71,10 @@ docs/                      调研产出：语法规范、内置模块速查
 - **`for` 只支持 `for (x in e)` / `for (k, v in e)`**：magic-script 没有 C 风格 `for(;;)`。
 - **`if`/`while` 的括号可选**，`for` 的括号必需 —— 与运行时解析器一致。
 
+## 0.1.2
+
+- 插件说明（Settings → Plugins 中的 Overview）与变更说明改为中文。
+
 ## 0.1.1 修复
 
 - **关键字不高亮**：magic-script 词法器把 `var`/`import`/`return` 等一律输出为标识符，而解析器靠文本判断关键字。

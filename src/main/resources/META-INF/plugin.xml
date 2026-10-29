@@ -5,21 +5,68 @@
     <vendor email="magic-api@ssssssss.org" url="https://www.ssssssss.org/magic-api/">magic-api</vendor>
 
     <description><![CDATA[
-        Language support for <a href="https://www.ssssssss.org/magic-api/">magic-api</a>
-        interface scripts (<code>.ms</code> files written in <b>magic-script</b>).
+        为 <a href="https://www.ssssssss.org/magic-api/">magic-api</a> 的接口脚本
+        （<code>.ms</code> 文件，书写语言为 <b>magic-script</b>）提供完整的 IDE 支持。
+        <br/><br/>
+        <b>语法高亮</b>
         <ul>
-            <li>Syntax highlighting for keywords, literals, regex, templates and
-                embedded <code>```lang ... ```</code> blocks</li>
-            <li>Completion of the built-in modules
-                (<code>db</code>, <code>request</code>, <code>response</code>,
-                <code>log</code>, <code>env</code>, <code>magic</code>, <code>http</code>)
-                and the implicit <code>path</code>/<code>header</code>/<code>cookie</code>/
-                <code>session</code>/<code>body</code> variables</li>
-            <li>Quick documentation for every module member</li>
-            <li>SQL keywords highlighted inside <code>"""..."""</code> blocks,
-                folding, brace matching, commenter and structure view</li>
+            <li>关键字、各类数字字面量（<code>1b</code>/<code>1s</code>/<code>1l</code>/<code>1f</code>/<code>1d</code>/<code>1m</code>）</li>
+            <li>单引号、双引号与多行 SQL 字符串 <code>"""..."""</code>，正则 <code>/\d+/g</code>，模板串 <code>`a${b}`</code></li>
+            <li>内嵌脚本块 <code>```lang ... ```</code>、注释</li>
+            <li><code>"""..."""</code> 内的 SQL 关键字单独着色</li>
         </ul>
+
+        <b>代码补全</b>
+        <ul>
+            <li><code>import</code> 后补全内置模块：<code>db</code>、<code>request</code>、<code>response</code>、
+                <code>log</code>、<code>env</code>、<code>magic</code>、<code>http</code></li>
+            <li><code>db.</code> 等模块成员补全，支持 <code>import db as d</code> 别名</li>
+            <li>隐式变量 <code>path</code>/<code>header</code>/<code>cookie</code>/<code>session</code>/<code>body</code>
+                与内置函数补全</li>
+        </ul>
+
+        <b>快速文档</b>
+        <ul>
+            <li>模块与方法的中文说明、参数签名与返回值（<kbd>F1</kbd> / macOS <kbd>Ctrl</kbd>+<kbd>J</kbd>）</li>
+        </ul>
+
+        <b>编辑辅助</b>
+        <ul>
+            <li>代码折叠：花括号块、多行字符串、内嵌脚本块、连续 <code>import</code>、连续注释</li>
+            <li>结构视图、注释切换（<code>//</code>、<code>/* */</code>）、括号匹配</li>
+            <li>配色方案页「MagicScript」，可逐项自定义颜色</li>
+        </ul>
+
+        <b>支持的导入写法</b>
+        <ul>
+            <li><code>import db;</code>（模块）</li>
+            <li><code>import 'java.util.Date' as Date;</code>（带引号）</li>
+            <li><code>import com.alibaba.fastjson.JSON;</code>（点号路径）、<code>import java.util.*;</code>（通配）</li>
+        </ul>
+
+        <br/>
+        <b>说明</b>：内置模块的补全与文档数据以 magic-api 2.2.2 源码为准，语法规则以 magic-script 1.9.0 源码为准，
+        均已逐条核对，避免给出运行时并不存在的提示。
     ]]></description>
+
+    <change-notes><![CDATA[
+        <b>0.1.2</b>
+        <ul>
+            <li>插件说明改为中文</li>
+        </ul>
+
+        <b>0.1.1</b>
+        <ul>
+            <li>修复：关键字（<code>var</code>、<code>import</code>、<code>return</code> 等）没有高亮的问题</li>
+            <li>修复：<code>import com.alibaba.fastjson.JSON;</code> 这类点号路径导入被误报为语法错误</li>
+            <li>新增：支持 <code>import java.util.*;</code> 通配导入</li>
+        </ul>
+
+        <b>0.1.0</b>
+        <ul>
+            <li>首个版本：语法高亮、模块补全、快速文档、代码折叠、结构视图</li>
+        </ul>
+    ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
 
