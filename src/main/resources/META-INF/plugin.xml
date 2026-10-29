@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <id>org.ssssssss.magicapi.idea</id>
+    <name>Magic API</name>
+    <vendor email="magic-api@ssssssss.org" url="https://www.ssssssss.org/magic-api/">magic-api</vendor>
+
+    <description><![CDATA[
+        Language support for <a href="https://www.ssssssss.org/magic-api/">magic-api</a>
+        interface scripts (<code>.ms</code> files written in <b>magic-script</b>).
+        <ul>
+            <li>Syntax highlighting for keywords, literals, regex, templates and
+                embedded <code>```lang ... ```</code> blocks</li>
+            <li>Completion of the built-in modules
+                (<code>db</code>, <code>request</code>, <code>response</code>,
+                <code>log</code>, <code>env</code>, <code>magic</code>, <code>http</code>)
+                and the implicit <code>path</code>/<code>header</code>/<code>cookie</code>/
+                <code>session</code>/<code>body</code> variables</li>
+            <li>Quick documentation for every module member</li>
+            <li>SQL keywords highlighted inside <code>"""..."""</code> blocks,
+                folding, brace matching, commenter and structure view</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="MagicScript"
+                  language="MagicScript"
+                  implementationClass="org.ssssssss.magicapi.idea.lang.MagicScriptFileType"
+                  fieldName="INSTANCE"
+                  extensions="ms"
+                  fileNames="*.ms"/>
+
+        <lang.parserDefinition language="MagicScript"
+                               implementationClass="org.ssssssss.magicapi.idea.lang.MagicScriptParserDefinition"/>
+
+        <lang.syntaxHighlighterFactory language="MagicScript"
+                                       implementationClass="org.ssssssss.magicapi.idea.highlight.MagicScriptSyntaxHighlighterFactory"/>
+
+        <colorSettingsPage implementation="org.ssssssss.magicapi.idea.highlight.MagicScriptColorSettingsPage"/>
+
+        <completion.contributor language="MagicScript"
+                                implementationClass="org.ssssssss.magicapi.idea.completion.MagicScriptCompletionContributor"/>
+
+        <lang.documentationProvider language="MagicScript"
+                                    implementationClass="org.ssssssss.magicapi.idea.documentation.MagicScriptDocumentationProvider"/>
+
+        <lang.foldingBuilder language="MagicScript"
+                             implementationClass="org.ssssssss.magicapi.idea.folding.MagicScriptFoldingBuilder"
+                             activeByDefault="true"/>
+
+        <lang.commenter language="MagicScript"
+                        implementationClass="org.ssssssss.magicapi.idea.lang.MagicScriptCommenter"/>
+
+        <lang.braceMatcher language="MagicScript"
+                           implementationClass="org.ssssssss.magicapi.idea.lang.MagicScriptBraceMatcher"/>
+
+        <annotator language="MagicScript"
+                   implementationClass="org.ssssssss.magicapi.idea.annotator.MagicScriptAnnotator"/>
+
+        <lang.psiStructureViewFactory language="MagicScript"
+                                      implementationClass="org.ssssssss.magicapi.idea.structure.MagicScriptStructureViewFactory"/>
+    </extensions>
+</idea-plugin>

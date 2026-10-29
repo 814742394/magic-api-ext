@@ -1,0 +1,13 @@
+# Build output
+build/
+.gradle/
+.gradle-home/
+.intellijPlatform/
+out/
+
+# IDE
+.idea/
+*.iml
+
+# macOS
+.DS_Store
