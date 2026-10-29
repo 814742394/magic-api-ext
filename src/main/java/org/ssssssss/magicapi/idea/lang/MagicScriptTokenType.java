@@ -19,6 +19,13 @@ public final class MagicScriptTokenType extends IElementType {
     public static final MagicScriptTokenType BLOCK_COMMENT = new MagicScriptTokenType("BLOCK_COMMENT");
 
     public static final MagicScriptTokenType IDENTIFIER = new MagicScriptTokenType("IDENTIFIER");
+
+    /**
+     * Reserved word. Never produced by the parser lexer (magic-script keeps
+     * keywords as plain identifiers and dispatches on their text); the
+     * highlighting lexer re-tags them so that the highlighter can colour them.
+     */
+    public static final MagicScriptTokenType KEYWORD = new MagicScriptTokenType("KEYWORD");
     public static final MagicScriptTokenType INT_LITERAL = new MagicScriptTokenType("INT_LITERAL");
     public static final MagicScriptTokenType LONG_LITERAL = new MagicScriptTokenType("LONG_LITERAL");
     public static final MagicScriptTokenType FLOAT_LITERAL = new MagicScriptTokenType("FLOAT_LITERAL");

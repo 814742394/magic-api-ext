@@ -131,14 +131,37 @@ public class MagicScriptParser implements PsiParser, MagicScriptElementTypes {
         marker.done(BLOCK_STATEMENT);
     }
 
+    /**
+     * {@code import log;}, {@code import 'java.util.Date' as Date;} or a bare
+     * dotted class name {@code import com.alibaba.fastjson.JSON;}.
+     *
+     * <p>magic-script's {@code parseImport} loops over {@code Period} after an
+     * unquoted identifier, so a dotted path is valid without quotes; a trailing
+     * {@code .*} is accepted too.</p>
+     */
     private void parseImport(PsiBuilder builder) {
         PsiBuilder.Marker marker = builder.mark();
         builder.advanceLexer(); // import
-        if (builder.getTokenType() == MagicScriptTokenType.STRING_LITERAL
-                || builder.getTokenType() == MagicScriptTokenType.IDENTIFIER) {
+        if (builder.getTokenType() == MagicScriptTokenType.STRING_LITERAL) {
             builder.advanceLexer();
+        } else if (builder.getTokenType() == MagicScriptTokenType.IDENTIFIER) {
+            builder.advanceLexer();
+            // dotted package / class name: com.alibaba.fastjson.JSON or java.util.*
+            while (builder.getTokenType() == MagicScriptTokenType.DOT) {
+                builder.advanceLexer();
+                if (builder.getTokenType() == MagicScriptTokenType.IDENTIFIER) {
+                    builder.advanceLexer();
+                } else if (builder.getTokenType() == MagicScriptTokenType.OPERATION_SIGN
+                        && "*".equals(builder.getTokenText())) {
+                    builder.advanceLexer();
+                    break;
+                } else {
+                    builder.error("Expected a class name segment");
+                    break;
+                }
+            }
         } else {
-            builder.error("Expected a module name or a quoted class name");
+            builder.error("Expected a module name or a class name");
         }
         if (isKeyword(builder, "as")) {
             builder.advanceLexer();

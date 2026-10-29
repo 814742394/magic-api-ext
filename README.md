@@ -10,7 +10,8 @@
 | 能力 | 说明 |
 | --- | --- |
 | 文件类型 | `.ms` 文件自动识别为 MagicScript |
-| 语法高亮 | 关键字、各类数字字面量（`1b/1s/1l/1f/1d/1m`）、`'...'`/`"..."`/`"""SQL"""`、正则 `/\d+/g`、模板串 `` `a${b}` ``、内嵌语言块 ` ```lang ... ``` `、注释 |
+| 语法高亮 | 关键字（`var`/`import`/`return`/`if`/`exit`…）、各类数字字面量（`1b/1s/1l/1f/1d/1m`）、`'...'`/`"..."`/`"""SQL"""`、正则 `/\d+/g`、模板串 `` `a${b}` ``、内嵌语言块 ` ```lang ... ``` `、注释 |
+| import 形式 | `import db;`（模块）、`import 'java.util.Date' as Date;`（引号）、`import com.alibaba.fastjson.JSON;`（点号路径）、`import java.util.*;`（通配） |
 | 语义高亮 | 内置模块（`db`/`request`/...）、隐式变量（`path`/`header`/`cookie`/`session`/`body`）、内置函数；`"""..."""` 里的 SQL 关键字 |
 | 补全 | `import ` 后的模块名；`db.` 等模块成员；表达式起始处的隐式变量 / 全局函数 / 语句关键字；`import db as d` 别名解析 |
 | 快速文档 | 光标停在模块或成员上按 <kbd>F1</kbd>（macOS <kbd>Ctrl</kbd>+<kbd>J</kbd>）查看签名、返回值与中文说明 |
@@ -69,6 +70,14 @@ docs/                      调研产出：语法规范、内置模块速查
 - **`redis`/`mongo`/`elasticsearch`/`nebula` 只给模块名、不给成员**：它们由 `DynamicMethod` 在运行时决定方法，静态扫描无法得知，编造会产生假补全。
 - **`for` 只支持 `for (x in e)` / `for (k, v in e)`**：magic-script 没有 C 风格 `for(;;)`。
 - **`if`/`while` 的括号可选**，`for` 的括号必需 —— 与运行时解析器一致。
+
+## 0.1.1 修复
+
+- **关键字不高亮**：magic-script 词法器把 `var`/`import`/`return` 等一律输出为标识符，而解析器靠文本判断关键字。
+  原实现直接用该词法器做高亮，导致整份文件没有任何关键字着色。现新增
+  `MagicScriptHighlightingLexer` 在高亮层把保留字重标为 `KEYWORD`，解析器行为不受影响。
+- **点号路径 import 报语法错误**：`import com.alibaba.fastjson.JSON;` 之前只吃了一个标识符，后面的 `.` 被当成语法错误。
+  现按 magic-script `parseImport` 的规则循环消费 `.` 段，并支持 `java.util.*`。
 
 ## 已知限制
 

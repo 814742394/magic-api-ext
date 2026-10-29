@@ -9,7 +9,6 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.ssssssss.magicapi.idea.lang.MagicScriptTokenType;
-import org.ssssssss.magicapi.idea.lang.lexer.MagicScriptLexer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,25 +77,21 @@ public class MagicScriptSyntaxHighlighter extends SyntaxHighlighterBase {
         KEYS.put(MagicScriptTokenType.SAFE_DOT, DOT);
         KEYS.put(MagicScriptTokenType.COMMA, COMMA);
         KEYS.put(MagicScriptTokenType.SEMICOLON, SEMICOLON);
+        KEYS.put(MagicScriptTokenType.KEYWORD, KEYWORD);
         KEYS.put(MagicScriptTokenType.BAD_CHARACTER, BAD_CHARACTER);
         KEYS.put(TokenType.BAD_CHARACTER, BAD_CHARACTER);
     }
 
     @Override
     public @NotNull Lexer getHighlightingLexer() {
-        return new MagicScriptLexer();
+        // Keywords are plain identifiers to the parser; the decorator tags them.
+        return new MagicScriptHighlightingLexer();
     }
 
     @Override
     public TextAttributesKey @NotNull [] getTokenHighlights(IElementType tokenType) {
         TextAttributesKey key = KEYS.get(tokenType);
-        if (key == null) {
-            if (tokenType == MagicScriptTokenType.IDENTIFIER) {
-                return EMPTY_ARRAY;
-            }
-            return EMPTY_ARRAY;
-        }
-        return pack(key);
+        return key == null ? EMPTY_ARRAY : pack(key);
     }
 
     private static final TextAttributesKey[] EMPTY_ARRAY = new TextAttributesKey[0];

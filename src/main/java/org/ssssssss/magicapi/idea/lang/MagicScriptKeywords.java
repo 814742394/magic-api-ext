@@ -32,6 +32,21 @@ public final class MagicScriptKeywords {
     );
 
     /**
+     * Words that the syntax highlighter colours as keywords.
+     *
+     * <p>This is {@link #ALL} minus the Linq clause words: {@code from},
+     * {@code where}, {@code order} ... are only keywords inside a {@code select}
+     * expression and are perfectly valid variable names elsewhere, so colouring
+     * them unconditionally would be wrong.</p>
+     */
+    public static final Set<String> HIGHLIGHT = Set.of(
+            "import", "as", "var", "let", "const", "return", "break", "continue",
+            "if", "for", "in", "new", "true", "false", "null", "else", "try",
+            "catch", "finally", "async", "while", "exit", "and", "or", "throw",
+            "assert", "instanceof", "select"
+    );
+
+    /**
      * Words the magic-script parser special-cases but that are not reserved:
      * {@code and}/{@code or} are also valid member names after a dot.
      */

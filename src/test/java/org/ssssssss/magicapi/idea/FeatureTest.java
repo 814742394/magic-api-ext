@@ -104,6 +104,60 @@ public class FeatureTest extends BasePlatformTestCase {
         assertTrue("some tokens must be highlighted", highlighted > 0);
     }
 
+    /**
+     * Regression: keywords must be coloured. magic-script emits them as plain
+     * identifiers, so the highlighting lexer has to re-tag them; otherwise a
+     * whole file renders with no keyword highlighting at all.
+     */
+    public void testKeywordsAreHighlighted() {
+        com.intellij.openapi.fileTypes.SyntaxHighlighter highlighter =
+                new org.ssssssss.magicapi.idea.highlight.MagicScriptSyntaxHighlighterFactory()
+                        .getSyntaxHighlighter(getProject(), null);
+        var lexer = highlighter.getHighlightingLexer();
+        String code = "import db; var ok = (data) => { return null; }; if (true) { exit 400; }";
+        lexer.start(code);
+        java.util.List<String> keywords = new java.util.ArrayList<>();
+        while (lexer.getTokenType() != null) {
+            if (lexer.getTokenType() == org.ssssssss.magicapi.idea.lang.MagicScriptTokenType.KEYWORD
+                    && highlighter.getTokenHighlights(lexer.getTokenType()).length > 0) {
+                keywords.add(code.substring(lexer.getTokenStart(), lexer.getTokenEnd()));
+            }
+            lexer.advance();
+        }
+        assertTrue("var/import/return/if/exit/true/null must be keyword-highlighted, got " + keywords,
+                keywords.containsAll(java.util.List.of("import", "var", "return", "if", "exit", "true", "null")));
+    }
+
+    /**
+     * Ordinary identifiers must not be re-tagged, and Linq clause words
+     * ({@code where}/{@code from}/{@code order}) are only keywords inside a
+     * {@code select}, so they stay plain identifiers here.
+     */
+    public void testPlainIdentifiersAreNotKeywords() {
+        com.intellij.openapi.fileTypes.SyntaxHighlighter highlighter =
+                new org.ssssssss.magicapi.idea.highlight.MagicScriptSyntaxHighlighterFactory()
+                        .getSyntaxHighlighter(getProject(), null);
+        java.util.Map<String, org.ssssssss.magicapi.idea.lang.MagicScriptTokenType> byText =
+                new java.util.LinkedHashMap<>();
+        String code = "name data where from order status errorcode";
+        var lexer = highlighter.getHighlightingLexer();
+        lexer.start(code);
+        while (lexer.getTokenType() != null) {
+            if (lexer.getTokenType() == org.ssssssss.magicapi.idea.lang.MagicScriptTokenType.IDENTIFIER
+                    || lexer.getTokenType() == org.ssssssss.magicapi.idea.lang.MagicScriptTokenType.KEYWORD) {
+                byText.put(code.substring(lexer.getTokenStart(), lexer.getTokenEnd()),
+                        (org.ssssssss.magicapi.idea.lang.MagicScriptTokenType) lexer.getTokenType());
+            }
+            lexer.advance();
+        }
+        assertEquals(java.util.Set.of("name", "data", "where", "from", "order", "status", "errorcode"),
+                byText.keySet());
+        for (var entry : byText.entrySet()) {
+            assertEquals("must stay a plain identifier: " + entry.getKey(),
+                    org.ssssssss.magicapi.idea.lang.MagicScriptTokenType.IDENTIFIER, entry.getValue());
+        }
+    }
+
     public void testCommenterPrefixes() {
         org.ssssssss.magicapi.idea.lang.MagicScriptCommenter commenter =
                 new org.ssssssss.magicapi.idea.lang.MagicScriptCommenter();
