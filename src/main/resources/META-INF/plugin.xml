@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>org.ssssssss.magicapi.idea</id>
     <name>Magic API</name>
-    <vendor email="magic-api@ssssssss.org" url="https://www.ssssssss.org/magic-api/">magic-api</vendor>
+    <vendor email="814742394@qq.com" url="https://github.com/814742394/magic-api-ext">zhengXL</vendor>
 
     <description><![CDATA[
         为 <a href="https://www.ssssssss.org/magic-api/">magic-api</a> 的接口脚本
@@ -50,6 +50,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>0.1.3</b>
+        <ul>
+            <li>插件署名改为 zhengXL</li>
+            <li>新增发布脚本与发布文档</li>
+            <li>构建不再依赖写死的本机路径，克隆后可直接构建</li>
+        </ul>
+
         <b>0.1.2</b>
         <ul>
             <li>插件说明改为中文</li>

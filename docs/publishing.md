@@ -20,12 +20,29 @@
 
 ## 发布方式
 
-### 本地发布（推荐先把令牌放进环境变量）
+### 推荐：用自带脚本（令牌不回显、不进历史）
+
+```bash
+./scripts/publish.sh
+```
+
+脚本会提示你粘贴令牌（输入时不显示），然后依次跑测试、构建、发布。
+令牌只存在于该进程内存中，不写入任何文件。
+
+### 手动发布
 
 ```bash
 export PUBLISH_TOKEN="perm:xxxxxxxxxxxxxxxx"
 
 ./gradlew publishPlugin -PideaPath="/Applications/IntelliJ IDEA.app"
+```
+
+> ⚠️ **不要把令牌贴到聊天、截图、issue 或提交里**。一旦泄露，请立刻到
+> <https://plugins.jetbrains.com/author/me/tokens> 撤销并重新生成：
+
+```bash
+# 撤销后从环境变量清除
+unset PUBLISH_TOKEN
 ```
 
 令牌也可以放在仓库外的 `~/.gradle/gradle.properties`：
