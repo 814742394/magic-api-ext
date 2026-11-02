@@ -1,12 +1,32 @@
 # Magic API — IntelliJ IDEA 插件
 
 ![Build](https://github.com/814742394/magic-api-ext/actions/workflows/build.yml/badge.svg)
-
+[![JetBrains Marketplace](https://img.shields.io/badge/Marketplace-Magic%20API-blue?logo=jetbrains)](https://plugins.jetbrains.com/plugin/35622-magic-api)
+[![License](https://img.shields.io/github/license/814742394/magic-api-ext)](LICENSE)
 
 为 [magic-api](https://www.ssssssss.org/magic-api/) 的接口脚本（[magic-script](https://gitee.com/ssssssss-team/magic-script) 语言）提供 IDE 支持：
 语法高亮、内置模块补全、快速文档、代码折叠、结构视图。
 
 目标 IDE：**IntelliJ IDEA 2026.1+**（`sinceBuild=261`，自带 JRE 21+）。
+
+## 安装
+
+### 从插件市场安装（推荐）
+
+**方式一（IDE 内）**：打开 <kbd>Settings</kbd> → <kbd>Plugins</kbd> → <kbd>Marketplace</kbd>，
+搜索 **Magic API**，点击 <kbd>Install</kbd>，重启 IDE。
+
+**方式二（网页直达）**：打开插件主页，点 <kbd>Get</kbd>，或在 IDE 中选择 <kbd>Install to…</kbd>：
+
+> <https://plugins.jetbrains.com/plugin/35622-magic-api>
+
+安装后打开任意 `.ms` 文件即可生效，无需额外配置。
+
+### 离线安装
+
+从 [Releases](https://github.com/814742394/magic-api-ext/releases) 下载
+`magic-api-idea-<version>.zip`，然后 <kbd>Settings</kbd> → <kbd>Plugins</kbd> → ⚙️ →
+<kbd>Install Plugin from Disk…</kbd> → 选择 zip → 重启。
 
 ## 功能
 
@@ -22,40 +42,38 @@
 | 结构视图 | <kbd>⌘</kbd>+<kbd>7</kbd> 查看 import / 变量声明 / lambda / return / exit / Linq 大纲 |
 | 其它 | 注释切换（`//`、`/* */`）、括号匹配、配色方案页「MagicScript」 |
 
-## 安装
+### 效果示例
 
-> 发布到 JetBrains Marketplace 的流程见 [`docs/publishing.md`](docs/publishing.md)。
+```javascript
+import log;
+import com.alibaba.fastjson.JSON;
 
-### 从 Marketplace 安装（发布后）
+var id = path.id;                       // path/header/cookie/session/body 均可补全
 
-*Settings → Plugins → Marketplace* 搜索 **Magic API** 安装即可。
+var user = db.selectOne("""
+    select id, name from user where id = #{id}
+""");                                    // 多行 SQL 内的关键字单独着色
 
-### 从本地构建安装
+if (user == null) {
+    exit 404, '用户不存在';               // 关键字与 exit 语句均有高亮
+}
 
-从源码构建后安装：
-
-```bash
-# 使用本机已安装的 IDEA 作为编译 SDK（推荐，避免下载数百 MB）
-./gradlew buildPlugin -PideaPath="/Applications/IntelliJ IDEA.app"
-
-# 或用环境变量 / gradle.properties 里的 ideaPath 指定
-export IDEA_PATH="/Applications/IntelliJ IDEA.app"
-./gradlew buildPlugin
-
-# 不指定时自动下载 IntelliJ IDEA Community 2026.1 作为 SDK
-./gradlew buildPlugin
-
-# 产物
-build/distributions/magic-api-idea-0.1.2.zip
+log.info('查询用户 {}', id);              // db./log. 等内置模块成员可补全
+return { code: 1, data: user };
 ```
 
-在 IDE 中：<kbd>Settings</kbd> → <kbd>Plugins</kbd> → ⚙️ → <kbd>Install Plugin from Disk…</kbd> → 选择上面的 zip → 重启。
+## 版本与更新记录
 
-调试运行时模式：
+| 版本 | 主要变化 |
+| --- | --- |
+| **0.1.4** | 修复插件描述格式（Marketplace 要求以拉丁字符开头），成功上架 |
+| 0.1.3 | 插件署名改为 `zhengXL`；构建不再依赖本机绝对路径；新增发布脚本 |
+| 0.1.2 | 插件说明与变更说明改为中文 |
+| 0.1.1 | 修复关键字不高亮；修复点号路径 `import` 被误报语法错误；支持 `import java.util.*;` |
+| 0.1.0 | 首个版本：语法高亮、模块补全、快速文档、代码折叠、结构视图 |
 
-```bash
-./gradlew runIde        # 启动一个装有本插件的沙箱 IDE
-```
+完整变更说明见 [Releases](https://github.com/814742394/magic-api-ext/releases) 与
+[`META-INF/plugin.xml`](src/main/resources/META-INF/plugin.xml) 的 `<change-notes>`。
 
 ## 工程结构
 
@@ -65,14 +83,15 @@ src/main/java/org/ssssssss/magicapi/idea/
 │   ├── lexer/             手写 LexerBase 实现
 │   ├── parser/            递归下降 Parser（优先级与 magic-script 源码一致）
 │   └── psi/               IElementType 常量表
-├── highlight/             语法高亮 + 配色方案页
+├── highlight/             语法高亮 + 配色方案页（含 KEYWORD 重标词法器）
 ├── completion/            内置模块数据（MagicBuiltins）与补全贡献者
 ├── documentation/         快速文档渲染与 provider
 ├── folding/               折叠
 ├── structure/             结构视图
 └── annotator/             语义高亮与轻量检查
 src/main/resources/META-INF/plugin.xml
-docs/                      调研产出：语法规范、内置模块速查
+docs/                      调研产出与流程文档（见下方「文档」一节）
+samples/                   可直接打开的 .ms 示例脚本
 ```
 
 ## 数据来源与准确性
@@ -89,17 +108,14 @@ docs/                      调研产出：语法规范、内置模块速查
 - **`for` 只支持 `for (x in e)` / `for (k, v in e)`**：magic-script 没有 C 风格 `for(;;)`。
 - **`if`/`while` 的括号可选**，`for` 的括号必需 —— 与运行时解析器一致。
 
-## 0.1.2
+## 文档
 
-- 插件说明（Settings → Plugins 中的 Overview）与变更说明改为中文。
-
-## 0.1.1 修复
-
-- **关键字不高亮**：magic-script 词法器把 `var`/`import`/`return` 等一律输出为标识符，而解析器靠文本判断关键字。
-  原实现直接用该词法器做高亮，导致整份文件没有任何关键字着色。现新增
-  `MagicScriptHighlightingLexer` 在高亮层把保留字重标为 `KEYWORD`，解析器行为不受影响。
-- **点号路径 import 报语法错误**：`import com.alibaba.fastjson.JSON;` 之前只吃了一个标识符，后面的 `.` 被当成语法错误。
-  现按 magic-script `parseImport` 的规则循环消费 `.` 段，并支持 `java.util.*`。
+| 文档 | 内容 |
+| --- | --- |
+| [docs/marketplace-publishing.md](docs/marketplace-publishing.md) | JetBrains Marketplace 上架与更新流程（含描述格式校验等已知坑） |
+| [docs/release.md](docs/release.md) | GitHub 发版流程（打 tag 自动出 Release、CI 配置要点） |
+| [docs/grammar-reference.md](docs/grammar-reference.md) | magic-script 语法规范（基于 1.9.0 源码实测） |
+| [docs/magic-api-builtins.md](docs/magic-api-builtins.md) | magic-api 内置模块与函数速查 |
 
 ## 已知限制
 
@@ -107,26 +123,45 @@ docs/                      调研产出：语法规范、内置模块速查
 - 不解析 magic-api 的服务端资源目录（`.ms` 文件的 `info.json` 分组/路径元数据），因为插件工作在纯文件模式下。
 - 未实现「跳转到定义」和「重命名」，因为这些概念在 magic-script 里对应运行时注入的模块。
 
-## 开发
+## 参与开发
 
 ```bash
-./gradlew test          # 28 个测试：词法、语法、补全、文档、折叠
-./gradlew verifyPlugin  # 插件兼容性校验（需联网）
+# 构建（复用本机 IDEA 作为 SDK，避免下载数百 MB）
+./gradlew buildPlugin -PideaPath="/Applications/IntelliJ IDEA.app"
+
+# 运行全部测试（39 个：词法、语法、补全、文档、折叠、示例脚本）
+./gradlew test -PideaPath="/Applications/IntelliJ IDEA.app"
+
+# 启动一个装好本插件的沙箱 IDE，手工验证效果
+./gradlew runIde -PideaPath="/Applications/IntelliJ IDEA.app"
 ```
 
-测试使用平台提供的 `BasePlatformTestCase` 轻量夹具。编译/测试 SDK 的解析顺序：
+编译/测试 SDK 的解析顺序：
 
 1. `-PideaPath=...` 或 `gradle.properties` 中的 `ideaPath`
 2. 环境变量 `IDEA_PATH`
-3. 都没有时，下载 IntelliJ IDEA Community 2026.1
+3. 都没有时，自动下载 IntelliJ IDEA `2026.1.5`
 
-这样在 IDE 里直接打开工程也能构建，同时不把某台机器的绝对路径写进版本库。
+测试使用平台提供的 `BasePlatformTestCase` 轻量夹具，覆盖词法、语法树、
+补全、快速文档、折叠与真实示例脚本解析。
 
-## 持续集成
+## 发版
 
-`.github/workflows/build.yml` 会在每次 push / PR 时用 JDK 21 + IntelliJ IDEA Community 2026.1
-跑完整测试并构建插件包，产物作为 workflow artifact 上传（见仓库 Actions 页面）。
+推送 `v*` 标签即可自动完成测试、构建、创建 GitHub Release 并挂上插件包：
+
+```bash
+sed -i '' 's/^pluginVersion=.*/pluginVersion=0.1.5/' gradle.properties   # 递增版本
+git add -A && git commit -m "Release 0.1.5"
+git tag v0.1.5 && git push origin main --tags
+```
+
+上架到插件市场的详细步骤见 [docs/marketplace-publishing.md](docs/marketplace-publishing.md)。
 
 ## 许可
 
-MIT，与 magic-api / magic-script 一致。
+[MIT](LICENSE) — 与 magic-api / magic-script 一致。
+
+## 反馈
+
+- 问题与建议：<https://github.com/814742394/magic-api-ext/issues>
+- 插件市场页面评分与评论：<https://plugins.jetbrains.com/plugin/35622-magic-api>
